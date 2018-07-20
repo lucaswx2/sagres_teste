@@ -12,10 +12,13 @@
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('alunos.index');
 });
 
 Route::get('/alunos/remove/{id}', 'AlunoController@remover')->name('alunos.remove');
+Route::get('/disciplinas/remove/{id}', 'DisciplinaController@remover')->name('disciplinas.remove');
 Route::resources([
     'alunos' => 'AlunoController',
+    'disciplinas' => 'DisciplinaController',
+    'notas' => 'NotaController'
 ]);

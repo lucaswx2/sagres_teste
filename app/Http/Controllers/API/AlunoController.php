@@ -1,8 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\API;
+
 use App\Aluno;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use Illuminate\Pagination\Paginator;
 use Validator;
 class AlunoController extends Controller
@@ -36,24 +38,11 @@ class AlunoController extends Controller
             return $page;
         });
         if($buscar){
-            $alunos = Aluno::where('nome','=', $buscar)->paginate($qtd);
+            $alunos = Aluno::where('nome','like', "%$buscar%")->paginate($qtd);
         }else{
             $alunos = Aluno::paginate($qtd);
         }
-        $alunos = $alunos->appends(Request::capture()->except('page'));
-
-        return view('alunos.index', compact('alunos'));
-
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        return view('alunos.create');
+        return response()->json($alunos,200 );
     }
 
     /**
@@ -70,8 +59,11 @@ class AlunoController extends Controller
         }
         $dados = $request->all();
         $aluno = Aluno::create($dados);
-        $aluno->save();
-        return redirect()->route('alunos.index');
+        if( $aluno->save()){
+            return response()->json($aluno,201  );
+        }else{
+            return response()->json(['message'=>'Erro ao inserir aluno!'],400  );
+        }
     }
 
     /**
@@ -83,21 +75,11 @@ class AlunoController extends Controller
     public function show($id)
     {
         $aluno = Aluno::find($id);
-
-        return view('alunos.show', compact('aluno'));
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Aluno  $aluno
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        $aluno = Aluno::find($id);
-
-        return view('alunos.edit', compact('aluno'));
+        if($aluno){
+            return response()->json($aluno,200   );
+        }else{
+            return response()->json(['message'=>'Aluno não encontrado!'],404  );
+        }
     }
 
     /**
@@ -110,22 +92,18 @@ class AlunoController extends Controller
     public function update(Request $request, $id)
     {
         $validator = $this->validarAluno($request);
-
         if($validator->fails()){
-            return redirect()->back()->withErrors($validator->errors());
+            return response()->json(['message'=>'Erro ao atualizar aluno!','erro'=>$validator->errors()],404  );
         }
         $aluno = Aluno::find($id);
+
         $dados = $request->all();
         $aluno->update($dados);
-        return redirect()->route('alunos.index');
-
-    }
-
-    public function remover($id)
-    {
-        $aluno = Aluno::find($id);
-
-        return view('alunos.remove', compact('aluno'));
+        if( $aluno){
+            return response()->json($aluno,200  );
+        }else{
+            return response()->json('erro',200  );
+        }
     }
 
     /**
@@ -136,7 +114,11 @@ class AlunoController extends Controller
      */
     public function destroy($id)
     {
-        Aluno::find($id)->delete();
-        return redirect()->route('alunos.index');
+        $aluno = Aluno::find($id)->delete();
+        if( $aluno){
+            return response()->json(['message'=>'Deletado com sucesso!'],200  );
+        }else{
+            return response()->json(['message'=>'Erro ao deletar aluno!'],404  );
+        }
     }
 }

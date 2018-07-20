@@ -1,24 +1,17 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Aluno;
-use Illuminate\Http\Request;
-use Illuminate\Pagination\Paginator;
 use Validator;
-class AlunoController extends Controller
+use Illuminate\Pagination\Paginator;
+
+use App\Disciplina;
+use Illuminate\Http\Request;
+
+class DisciplinaController extends Controller
 {
-
-
-    protected function validarAluno($request){
+    protected function validarDisciplina($request){
         $validator = Validator::make($request->all(), [
             "nome" => "required",
-            "matricula"=> "required | numeric | unique:alunos",
-            "endereco" => "required",
-            "bairro" => "required",
-            "cep" => "required | numeric",
-            "cidade" => "required",
-            "uf" => "required",
-            "email" => "required | email",
         ]);
         return $validator;
     }
@@ -36,13 +29,13 @@ class AlunoController extends Controller
             return $page;
         });
         if($buscar){
-            $alunos = Aluno::where('nome','=', $buscar)->paginate($qtd);
+            $disciplinas = Disciplina::where('nome','=', $buscar)->paginate($qtd);
         }else{
-            $alunos = Aluno::paginate($qtd);
+            $disciplinas = Disciplina::paginate($qtd);
         }
-        $alunos = $alunos->appends(Request::capture()->except('page'));
+        $disciplinas = $disciplinas->appends(Request::capture()->except('page'));
 
-        return view('alunos.index', compact('alunos'));
+        return view('disciplinas.index', compact('disciplinas'));
 
     }
 
@@ -53,7 +46,7 @@ class AlunoController extends Controller
      */
     public function create()
     {
-        return view('alunos.create');
+        return view('disciplinas.create');
     }
 
     /**
@@ -64,79 +57,81 @@ class AlunoController extends Controller
      */
     public function store(Request $request)
     {
-        $validator = $this->validarAluno($request);
+        $validator = $this->validarDisciplina($request);
         if($validator->fails()){
-            return $validator->errors();
+            return redirect()->back()->withErrors($validator->errors());
         }
+
+
         $dados = $request->all();
-        $aluno = Aluno::create($dados);
-        $aluno->save();
-        return redirect()->route('alunos.index');
+        $disciplina = Disciplina::create($dados);
+        $disciplina->save();
+        return redirect()->route('disciplinas.index');
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Aluno  $aluno
+     * @param  \App\Aluno  $disciplina
      * @return \Illuminate\Http\Response
      */
     public function show($id)
     {
-        $aluno = Aluno::find($id);
+        $disciplina = Disciplina::find($id);
 
-        return view('alunos.show', compact('aluno'));
+        return view('disciplinas.show', compact('disciplina'));
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Aluno  $aluno
+     * @param  \App\Aluno  $disciplina
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
     {
-        $aluno = Aluno::find($id);
+        $disciplina = Disciplina::find($id);
 
-        return view('alunos.edit', compact('aluno'));
+        return view('disciplinas.edit', compact('disciplina'));
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Aluno  $aluno
+     * @param  \App\Aluno  $disciplina
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
     {
-        $validator = $this->validarAluno($request);
+        $validator = $this->validarDisciplina($request);
 
         if($validator->fails()){
             return redirect()->back()->withErrors($validator->errors());
         }
-        $aluno = Aluno::find($id);
+        $disciplina = Disciplina::find($id);
         $dados = $request->all();
-        $aluno->update($dados);
-        return redirect()->route('alunos.index');
+        $disciplina->update($dados);
+        return redirect()->route('disciplinas.index');
 
     }
 
     public function remover($id)
     {
-        $aluno = Aluno::find($id);
+        $disciplina = Disciplina::find($id);
 
-        return view('alunos.remove', compact('aluno'));
+        return view('disciplinas.remove', compact('disciplina'));
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Aluno  $aluno
+     * @param  \App\Aluno  $disciplina
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
     {
-        Aluno::find($id)->delete();
-        return redirect()->route('alunos.index');
+        Disciplina::find($id)->delete();
+        return redirect()->route('disciplinas.index');
     }
 }

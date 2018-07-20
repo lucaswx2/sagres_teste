@@ -23,8 +23,8 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                 <div class="navbar-nav">
-                    <a class="nav-item nav-link active" href="{{route('alunos.index')}}">Alunos <span class="sr-only">(current)</span></a>
-                    <a class="nav-item nav-link " href="#">Disciplinas <span class="sr-only">(current)</span></a>
+                    <a class="nav-item nav-link {{ Request::is('alunos') ? 'active' : '' }}" href="{{route('alunos.index')}}">Alunos <span class="sr-only">(current)</span></a>
+                    <a class="nav-item nav-link {{ Request::is('disciplinas') ? 'active' : '' }}" href="{{route('disciplinas.index')}}">Disciplinas <span class="sr-only">(current)</span></a>
                 </div>
             </div>
     </div>
